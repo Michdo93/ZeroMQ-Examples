@@ -1,115 +1,92 @@
 # ZeroMQ-Examples 🚀
 
-This repository contains practical examples of using **ZeroMQ (ØMQ)** in Python. The focus is on the **Publish/Subscribe (Pub/Sub)** pattern, which allows real-time data streaming (such as text messages, live webcam frames, or microphone audio) from a single publisher to one or multiple subscribers.
+This repository contains various examples demonstrating different messaging patterns using **ZeroMQ (ØMQ)** in Python. It covers Publish/Subscribe, Request-Reply, Task Pipelines, and Peer-to-Peer communication.
+
+---
 
 ## ⚙️ Installation & Prerequisites
 
-Before running the examples, you need to install Python, the core ZeroMQ library, and the required Python packages.
+Before running the examples, make sure you have Python, the ZeroMQ C library, and the required Python packages installed.
 
 ### 1. Basic ZeroMQ Installation
 
-Depending on your operating system, install the core ZeroMQ C-library and the official Python bindings (`pyzmq`):
+Depending on your operating system:
 
-* **Windows:**
-  On Windows, installing the Python package is usually sufficient, as pre-compiled binaries for `libzmq` are included automatically:
+*   **Windows:**
+    Usually, installing the Python package is sufficient since precompiled binaries are bundled:
+    ```bash
+    pip install pyzmq
+    ```
+*   **Linux (Ubuntu / Debian):**
+    Install the underlying C library first, followed by the Python binding:
+    ```bash
+    sudo apt-get update
+    sudo apt-get install libzmq3-dev
+    pip install pyzmq
+    ```
 
-  ```
-  pip install pyzmq
-  ```
+### 2. Additional Libraries for Media Examples
 
-* **Linux (Ubuntu / Debian):**
-  Install the C-library using your package manager first, followed by the Python binding:
+For the webcam and microphone scripts, extra libraries are needed:
 
-  ```
-  sudo apt-get update
-  sudo apt-get install libzmq3-dev
-  pip install pyzmq
-  ```
-
-### 2. Additional Libraries for Media Streaming
-
-For the webcam and microphone streaming examples, install the following additional packages:
-
-```
-# For webcam video streaming (OpenCV)
+```bash
+# For webcam streaming (OpenCV)
 pip install opencv-python
 
 # For microphone audio streaming (Sounddevice & NumPy)
 pip install sounddevice numpy
 ```
 
+---
+
 ## 📂 Project Structure
 
-The repository is structured as follows:
-
-* `publisher.py` & `subscriber.py` – Simple text messaging example (weather updates).
-
+* `publisher.py` & `subscriber.py` – Simple text messaging (Pub/Sub pattern).
 * `webcam_publisher.py` & `webcam_subscriber.py` – Live webcam video streaming.
-
 * `microphone_publisher.py` & `microphone_subscriber.py` – Real-time microphone audio streaming.
+* `request_client.py` & `response_server.py` – Synchronous Request-Reply (Req/Rep pattern).
+* `pipeline_push.py`, `pipeline_pull.py`, `pipeline_sink.py` – Parallel task distribution (Push/Pull pattern).
+* `pair_one.py` & `pair_two.py` – Exclusive bidirectional communication (Pair pattern).
 
-## 🚀 Examples & Execution
+---
 
-To test each example, open **two separate terminal windows** (one for the publisher, one for the subscriber).
+## 🚀 Examples & Execution Guide
 
-### 1. Basic Text Messaging (Pub / Sub)
+### 1. Simple Text Messaging (Pub / Sub)
 
-A classic example where weather data is broadcasted with specific topic headers (`Wetter.Berlin`) and filtered on the receiving end.
+* **Start Publisher:** `python publisher.py`
+* **Start Subscriber:** `python subscriber.py`
 
-* **Start the Publisher:**
+### 2. Webcam Video Stream
 
-  ```
-  python publisher.py
-  ```
-
-* **Start the Subscriber:**
-
-  ```
-  python subscriber.py
-  ```
-
-### 2. Live Webcam Video Stream
-
-Captures frames from a local webcam, encodes them as JPEG images, transmits them over ZeroMQ, and displays the stream in an OpenCV window.
-
-* **Start the Publisher (captures video feed):**
-
-  ```
-  python webcam_publisher.py
-  ```
-
-* **Start the Subscriber (displays video feed):**
-
-  ```
-  python webcam_subscriber.py
-  ```
-
-  *Tip: Click on the active video window and press **`q`** to close it.*
+* **Start Publisher:** `python webcam_publisher.py`
+* **Start Subscriber:** `python webcam_subscriber.py` *(Press `q` inside the video window to exit)*
 
 ### 3. Microphone Audio Stream
 
-Captures audio input from your primary microphone in chunks and broadcasts them to be played back in real-time by the subscriber.
+> ⚠️ **Warning:** Wear headphones if running both on the same machine to avoid acoustic feedback!
 
-> ⚠️ **Important Notice (Audio Feedback):** If you run both the publisher and subscriber on the same computer, please wear **headphones** to prevent loud audio feedback loops!
+* **Start Publisher:** `python microphone_publisher.py`
+* **Start Subscriber:** `python microphone_subscriber.py`
 
-* **Start the Publisher (captures audio):**
+### 4. Request-Reply (Req / Rep)
 
-  ```
-  python microphone_publisher.py
-  ```
+Synchronous client-server communication where a client sends a request and must wait for a reply.
 
-* **Start the Subscriber (plays audio through speakers/headphones):**
+* **Start Server:** `python response_server.py`
+* **Start Client:** `python request_client.py`
 
-  ```
-  python microphone_subscriber.py
-  ```
+### 5. Task Pipeline (Push / Pull)
 
-## 🌐 Network Configuration (Multi-Device Setup)
+Distributes workloads from a ventilator across multiple workers, aggregating results at a sink.
 
-By default, all scripts are configured for local testing using `localhost` (`tcp://localhost:5555` / `tcp://*:5555`).
+1. Start the **Sink**: `python pipeline_sink.py`
+2. Start one or more **Workers**: `python pipeline_pull.py`
+3. Start the **Ventilator**: `python pipeline_push.py` *(Press Enter in the ventilator terminal to dispatch tasks)*
 
-To run the publisher and subscriber on **two different devices within the same local network**:
+### 6. Exclusive Pair (Pair-to-Pair)
 
-1. Open the subscriber script and replace `localhost` with the local IP address of the publisher machine (e.g., `tcp://192.168.1.50:5555`).
+Direct 1-to-1 bidirectional communication between two independent nodes.
 
-2. Ensure that the target port (e.g., `5555`) is allowed through the publisher machine's firewall.
+* **Start Node 1:** `python pair_one.py`
+* **Start Node 2:** `python pair_two.py`
