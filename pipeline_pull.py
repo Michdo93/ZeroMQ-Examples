@@ -28,8 +28,8 @@ def main():
         print("\nWorker stopping.")
     finally:
         receiver.close()
-    sender.close()
-    context.term()
+        sender.close()
+        context.term()
 
 
 if __name__ == "__main__":

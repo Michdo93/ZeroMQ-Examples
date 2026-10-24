@@ -1,5 +1,4 @@
 import time
-from opentelemetry import context
 import zmq
 
 def main():
@@ -20,9 +19,9 @@ def main():
         s = receiver.recv()
         print(".", end="", flush=True)
 
-        end_time = time.time()
-        total_time = (end_time - start_time) * 1000
-        print(f"\nTotal elapsed time: {total_time:.2f} msec")
+    end_time = time.time()
+    total_time = (end_time - start_time) * 1000
+    print(f"\nTotal elapsed time: {total_time:.2f} msec")
 
     receiver.close()
     context.term()
